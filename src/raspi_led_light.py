@@ -1,5 +1,5 @@
 class RasPiLEDLight():
-    """ラズパイを電力減としたLEDライトを表現します。"""
+    """ラズパイを電力源としたLEDライトを表現します。"""
 
     @property
     def color(self) -> str:
