@@ -1,63 +1,64 @@
 import time
 import RPi.GPIO as GPIO
 
+from raspi_led_light import RasPiLEDLight
+
 
 class BaseTrafficLight():
 
     @property
-    def gpio_blue(self) -> int:
-        return self._gpio_blue
+    def blue_light(self) -> RasPiLEDLight:
+        return self._blue_light
 
-    @gpio_blue.setter
-    def gpio_blue(self, val: int):
-        self._gpio_blue = val
-
-    @property
-    def gpio_yellow(self) -> int:
-        return self._gpio_yellow
-
-    @gpio_yellow.setter
-    def gpio_yellow(self, val: int):
-        self._gpio_yellow = val
+    @blue_light.setter
+    def blue_light(self, val: RasPiLEDLight):
+        self._blue_light = val
 
     @property
-    def gpio_red(self) -> int:
-        return self._gpio_red
+    def yellow_light(self) -> RasPiLEDLight:
+        return self._yellow_light
 
-    @gpio_red.setter
-    def gpio_red(self, val: int):
-        self._gpio_red = val
+    @yellow_light.setter
+    def yellow_light(self, val: RasPiLEDLight):
+        self._yellow_light = val
 
+    @property
+    def red_light(self) -> RasPiLEDLight:
+        return self._red_light
+
+    @red_light.setter
+    def red_light(self, val: RasPiLEDLight):
+        self._red_light = val
 
     def __init__(self):
-        self.gpio_blue = 16
-        self.gpio_yellow = 20
-        self.gpio_red = 21
+        self.blue_light = RasPiLEDLight(color="blue", gpio=16)
+        self.yellow_light = RasPiLEDLight(color="yellow", gpio=20)
+        self.red_light = RasPiLEDLight(color="red", gpio=21)
 
-        self.all_gpio_pins = [
-            self.gpio_blue, self.gpio_yellow, self.gpio_red,
+        self.all_lights = [
+            self.blue_light, self.yellow_light, self.red_light,
         ]
 
-        for gpio_pin in self.all_gpio_pins:
+        for light in self.all_lights:
             GPIO.setmode(GPIO.BCM)
-            GPIO.setup(gpio_pin, GPIO.OUT)
+            GPIO.setup(light.gpio, GPIO.OUT)
 
     def __call__(self):
         """メインルーチン"""
         while True:
-            self.lit_light(self.gpio_blue, 3)
-            self.lit_light(self.gpio_yellow, 3)
-            self.lit_light(self.gpio_red, 3)
+            self.lit_light(self.blue_light, 3)
+            self.lit_light(self.yellow_light, 3)
+            self.lit_light(self.red_light, 3)
 
-    def lit_light(self, gpio_pin: int, lit_time: int):
-        GPIO.output(gpio_pin, 1)
+    def lit_light(self, light: RasPiLEDLight, lit_time: int):
+        GPIO.output(light.gpio, 1)
 
         time.sleep(lit_time)
-        GPIO.output(gpio_pin, 0)
+        GPIO.output(light.gpio, 0)
 
     def __del__(self):
-        for gpio_pin in self.all_gpio_pins:
-            GPIO.output(gpio_pin, 0)
+        for light in self.all_lights:
+            GPIO.output(light.gpio, 0)
 
 
 if __name__ == "__main__":
